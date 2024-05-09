@@ -66,6 +66,8 @@ class GPTAssistantAgent(ConversableAgent):
             name=name, system_message=instructions, human_input_mode="NEVER", llm_config=openai_client_cfg, **kwargs
         )
 
+        self.overwrite_tools = overwrite_tools
+
         # GPTAssistantAgent's azure_deployment param may cause NotFoundError (404) in client.beta.assistants.list()
         # See: https://github.com/microsoft/autogen/pull/1721
         model_name = self.DEFAULT_MODEL_NAME
