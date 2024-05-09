@@ -12,6 +12,7 @@ from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Type, Ty
 from openai import BadRequestError
 
 from autogen.exception_utils import InvalidCarryOverType, SenderRequired
+from autogen.oai.openai_utils import update_gpt_assistant
 
 from .._pydantic import model_dump
 from ..cache.cache import AbstractCache
@@ -2475,6 +2476,9 @@ class ConversableAgent(LLMAgent):
             else:
                 self.llm_config["tools"] = [tool_sig]
 
+        if self.overwrite_tools:
+            self.update_openai_api_tools(self.llm_config["tools"])
+
         if len(self.llm_config["tools"]) == 0:
             del self.llm_config["tools"]
 
@@ -2521,6 +2525,10 @@ class ConversableAgent(LLMAgent):
         wrapped_func._origin = func
 
         return wrapped_func
+
+    def update_openai_api_tools(self, tools):
+        if self.overwrite_tools:
+            update_gpt_assistant(self._openai_client, self.assistant_id, {"tools": tools})
 
     def register_for_llm(
         self,
